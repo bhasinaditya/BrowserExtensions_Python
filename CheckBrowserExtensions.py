@@ -30,6 +30,8 @@ def check_browser_extensions():
                     print(f"{browser} extensions directory not found at: {path}")
                     continue
 
+                extension_list = []
+
                 if browser == "Firefox":
                     # Firefox stores extensions differently, in profile subdirectories
                     for profile in os.listdir(path):
@@ -39,9 +41,8 @@ def check_browser_extensions():
                             if os.path.exists(addon_path):
                                 for addon in os.listdir(addon_path):
                                     if addon.endswith('.xpi'):
-                                        # Try to read the manifest.json from the XPI (simplified approach)
-                                        print(
-                                            f"Firefox Extension: {addon} (XPI file, detailed parsing not implemented)")
+                                        # List .xpi files as extensions (simplified approach)
+                                        extension_list.append(f"{addon} (XPI file)")
                                         extensions_found = True
                 else:
                     # Chrome and Edge store extensions in subdirectories with manifest.json
@@ -56,11 +57,17 @@ def check_browser_extensions():
                                         with open(manifest_path, 'r', encoding='utf-8') as f:
                                             manifest = json.load(f)
                                             ext_name = manifest.get('name', 'Unknown Extension')
-                                            print(f"{browser} Extension: {ext_name}")
+                                            extension_list.append(ext_name)
                                             extensions_found = True
                                     except json.JSONDecodeError:
-                                        print(f"{browser} Extension: {ext_id} (Failed to parse manifest)")
+                                        extension_list.append(f"{ext_id} (Failed to parse manifest)")
                                         extensions_found = True
+
+                # Print extensions under a single browser heading
+                if extension_list:
+                    print(f"\n{browser} Extensions:")
+                    for ext_name in extension_list:
+                        print(f"  - {ext_name}")
 
             except Exception as e:
                 print(f"Error checking {browser} extensions: {e}")
