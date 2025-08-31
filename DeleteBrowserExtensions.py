@@ -72,10 +72,7 @@ class ExtensionManagerApp:
             for browser, path in browser_paths.items():
                 try:
                     if not os.path.exists(path):
-                        ttk.Label(self.scrollable_frame, text=f"{browser} extensions directory not found.").grid(
-                            row=row, column=0, sticky=tk.W, pady=2)
-                        row += 1
-                        continue
+                        continue  # Skip if directory doesn't exist
 
                     extension_list = []
 
@@ -109,7 +106,7 @@ class ExtensionManagerApp:
                                             extension_list.append((f"{ext_id} (Failed to parse manifest)", ext_path))
                                             extensions_found = True
 
-                    # Display extensions under a single browser heading
+                    # Display extensions under a single browser heading only if extensions exist
                     if extension_list:
                         ttk.Label(self.scrollable_frame, text=f"{browser} Extensions:",
                                   font=("Arial", 12, "bold")).grid(row=row, column=0, sticky=tk.W, pady=5)
