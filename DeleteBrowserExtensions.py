@@ -1,3 +1,7 @@
+"""
+Python script to delete browser extensions.
+"""
+
 import os
 import json
 import getpass

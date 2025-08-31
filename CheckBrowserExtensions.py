@@ -1,3 +1,9 @@
+"""
+Python script to return a list of installed browser extensions.
+
+TODO: Script needs to filter out extensions
+"""
+
 import os
 import json
 import getpass
