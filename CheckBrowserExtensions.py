@@ -8,38 +8,30 @@ import os
 import json
 import getpass
 
-
 def check_browser_extensions():
     try:
         # Get the current user's username
         username = getpass.getuser()
-
         # Define browser extension directories for Windows
         browser_paths = {
             "Chrome": os.path.expanduser(
                 f"C:\\Users\\{username}\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions"),
             "Edge": os.path.expanduser(
                 f"C:\\Users\\{username}\\AppData\\Local\\Microsoft\\Edge\\User Data\\Default\\Extensions"),
-            "Firefox": os.path.expanduser(f"C:\\Users\\{username}\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles")
+            "Firefox": os.path.expanduser(
+                f"C:\\Users\\{username}\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles")
         }
-
         if os.name != 'nt':
-            print("This script is designed to run on Windows systems only.")
             return
-
         extensions_found = False
-
         # Iterate through each browser
         for browser, path in browser_paths.items():
             try:
                 if not os.path.exists(path):
-                    print(f"{browser} extensions directory not found at: {path}")
                     continue
-
                 extension_list = []
-
                 if browser == "Firefox":
-                    # Firefox stores extensions differently, in profile subdirectories
+                    # Firefox stores extensions in profile subdirectories
                     for profile in os.listdir(path):
                         profile_path = os.path.join(path, profile)
                         if os.path.isdir(profile_path):
@@ -47,7 +39,6 @@ def check_browser_extensions():
                             if os.path.exists(addon_path):
                                 for addon in os.listdir(addon_path):
                                     if addon.endswith('.xpi'):
-                                        # List .xpi files as extensions (simplified approach)
                                         extension_list.append(f"{addon} (XPI file)")
                                         extensions_found = True
                 else:
@@ -63,30 +54,25 @@ def check_browser_extensions():
                                         with open(manifest_path, 'r', encoding='utf-8') as f:
                                             manifest = json.load(f)
                                             ext_name = manifest.get('name', 'Unknown Extension')
-                                            extension_list.append(ext_name)
-                                            extensions_found = True
+                                            # Silently skip extensions with __MSG in name
+                                            if '__MSG' not in ext_name:
+                                                extension_list.append(ext_name)
+                                                extensions_found = True
                                     except json.JSONDecodeError:
                                         extension_list.append(f"{ext_id} (Failed to parse manifest)")
                                         extensions_found = True
-
                 # Print extensions under a single browser heading
                 if extension_list:
                     print(f"\n{browser} Extensions:")
                     for ext_name in extension_list:
-                        print(f"  - {ext_name}")
-
-            except Exception as e:
-                print(f"Error checking {browser} extensions: {e}")
-
+                        print(f" - {ext_name}")
+            except Exception:
+                continue
         if not extensions_found:
-            print("No browser extensions found for Chrome, Edge, or Firefox.")
-
-    except Exception as e:
-        print(f"General error checking browser extensions: {e}")
-        if not os.name == 'nt':
-            print("This script is designed to run on Windows systems only.")
-
+            pass  # Silently continue if no extensions are found
+    except Exception:
+        if os.name != 'nt':
+            pass  # Silently continue for non-Windows systems
 
 if __name__ == "__main__":
-    print("Checking for installed browser extensions...")
     check_browser_extensions()
